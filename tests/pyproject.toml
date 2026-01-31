@@ -1,7 +1,7 @@
 [project]
-name = "s4e-tests"
+name = "s5e-tests"
 version = "0.1.0"
-description = "S4E test plotting scripts"
+description = "S5E test plotting scripts"
 requires-python = ">=3.13"
 dependencies = [
     "matplotlib>=3.10.8",

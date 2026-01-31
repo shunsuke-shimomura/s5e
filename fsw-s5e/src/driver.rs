@@ -4,7 +4,7 @@ pub mod actuator;
 pub mod sensor;
 
 pub struct CommandReceiver {
-    pub s4e_port: s4e_port::S4ESubscribePort<s4e_port::GSCommandData>,
+    pub s5e_port: s5e_port::S5ESubscribePort<s5e_port::GSCommandData>,
 }
 
 impl Default for CommandReceiver {
@@ -16,26 +16,26 @@ impl Default for CommandReceiver {
 impl CommandReceiver {
     pub fn new() -> Self {
         Self {
-            s4e_port: s4e_port::S4ESubscribePort::new(),
+            s5e_port: s5e_port::S5ESubscribePort::new(),
         }
     }
 
-    pub fn input(&mut self, cmd_port: &s4e_port::S4EPublishPort<s4e_port::GSCommandData>) {
-        s4e_port::transfer(cmd_port, &mut self.s4e_port);
+    pub fn input(&mut self, cmd_port: &s5e_port::S5EPublishPort<s5e_port::GSCommandData>) {
+        s5e_port::transfer(cmd_port, &mut self.s5e_port);
     }
 
     pub fn main_loop(&mut self) -> Option<data::ControllerCommand> {
-        self.s4e_port
+        self.s5e_port
             .subscribe()
             .map(|cmd_data| match cmd_data.command {
-                s4e_port::Command::ControllerCommand(cmd) => match cmd {
-                    s4e_port::ControllerCommand::RWControlTransition => {
+                s5e_port::Command::ControllerCommand(cmd) => match cmd {
+                    s5e_port::ControllerCommand::RWControlTransition => {
                         data::ControllerCommand::RWControlTransition
                     }
-                    s4e_port::ControllerCommand::ThreeAxisControlTransition(target_quaternion) => {
+                    s5e_port::ControllerCommand::ThreeAxisControlTransition(target_quaternion) => {
                         data::ControllerCommand::ThreeAxisControlTransition(target_quaternion)
                     }
-                    s4e_port::ControllerCommand::SunPointingControlTransition => {
+                    s5e_port::ControllerCommand::SunPointingControlTransition => {
                         data::ControllerCommand::SunPointingControlTransition
                     }
                 },

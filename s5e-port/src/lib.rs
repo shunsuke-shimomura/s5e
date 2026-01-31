@@ -3,11 +3,11 @@ use std::fmt::Debug;
 pub use nalgebra::{UnitQuaternion, Vector3};
 
 #[derive(Clone, Debug)]
-pub struct S4EPublishPort<T: Clone + Debug> {
+pub struct S5EPublishPort<T: Clone + Debug> {
     data: Option<T>,
 }
 
-impl<T: Clone + Debug> S4EPublishPort<T> {
+impl<T: Clone + Debug> S5EPublishPort<T> {
     pub fn new() -> Self {
         Self { data: None }
     }
@@ -22,11 +22,11 @@ impl<T: Clone + Debug> S4EPublishPort<T> {
 }
 
 #[derive(Clone, Debug)]
-pub struct S4ESubscribePort<T: Clone + Debug> {
+pub struct S5ESubscribePort<T: Clone + Debug> {
     data: Option<T>,
 }
 
-impl<T: Clone + Debug> S4ESubscribePort<T> {
+impl<T: Clone + Debug> S5ESubscribePort<T> {
     pub fn new() -> Self {
         Self { data: None }
     }
@@ -40,7 +40,7 @@ impl<T: Clone + Debug> S4ESubscribePort<T> {
     }
 }
 
-pub fn transfer<T: Clone + Debug>(from: &S4EPublishPort<T>, to: &mut S4ESubscribePort<T>) {
+pub fn transfer<T: Clone + Debug>(from: &S5EPublishPort<T>, to: &mut S5ESubscribePort<T>) {
     to.data = from.data.clone();
 }
 

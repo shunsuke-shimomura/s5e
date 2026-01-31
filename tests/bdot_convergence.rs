@@ -15,15 +15,15 @@ fn bdot_convergence() -> anyhow::Result<()> {
     let dt = 0.01;
     let rng = Rc::new(RefCell::new(rand::thread_rng()));
 
-    let tle = s4e::orbit::TLE::new(
+    let tle = s5e::orbit::TLE::new(
         "1 25544U 98067A   20076.51604214  .00016717  00000-0  10270-3 0  9005".to_string(),
         "2 25544  51.6412  86.9962 0006063  30.9353 329.2153 15.49228202 17647".to_string(),
     );
-    let mut sun = s4e::sun::Sun::new(datetime);
-    let mut earth = s4e::earth::Earth::new(datetime);
-    let mut moon = s4e::moon::Moon::new(datetime);
+    let mut sun = s5e::sun::Sun::new(datetime);
+    let mut earth = s5e::earth::Earth::new(datetime);
+    let mut moon = s5e::moon::Moon::new(datetime);
 
-    let mut sat = s4e::SpaceCraft::new(
+    let mut sat = s5e::SpaceCraft::new(
         &tle,
         datetime,
         rng,
@@ -43,7 +43,7 @@ fn bdot_convergence() -> anyhow::Result<()> {
         false,
     );
 
-    let mut cmd_port = s4e_port::S4EPublishPort::<s4e_port::GSCommandData>::new();
+    let mut cmd_port = s5e_port::S5EPublishPort::<s5e_port::GSCommandData>::new();
 
     // Setup CSV writer for test output
     fs::create_dir_all("tests/out/bdot")?;
@@ -105,11 +105,11 @@ fn bdot_convergence() -> anyhow::Result<()> {
         }
     }
 
-    if let fsw_s4e::controller::AttitudeControllMode::MTQ(mtq) =
+    if let fsw_s5e::controller::AttitudeControllMode::MTQ(mtq) =
         &sat.obc.fsw.attitude_controller.mode
         && matches!(
             mtq.mode,
-            fsw_s4e::controller::mtq::MTQControlMode::SunPointing(_)
+            fsw_s5e::controller::mtq::MTQControlMode::SunPointing(_)
         )
     {
         println!(

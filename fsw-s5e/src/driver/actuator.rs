@@ -1,5 +1,5 @@
 use nalgebra::{Matrix3, Vector3};
-use s4e_port::S4EPublishPort;
+use s5e_port::S5EPublishPort;
 
 use crate::{
     constants::{RW_INERTIA, RW_MAX_ANGULAR_ACCELERATION},
@@ -13,7 +13,7 @@ pub struct MagnetorquerDriverInput {
 
 pub struct MagnetorquerDriver {
     pub max_dipole_moment: f64,
-    pub s4e_port: S4EPublishPort<s4e_port::MagnetorquerCtrlEvent>,
+    pub s5e_port: S5EPublishPort<s5e_port::MagnetorquerCtrlEvent>,
     pub is_demagnetizing: bool,
 }
 
@@ -27,7 +27,7 @@ impl MagnetorquerDriver {
     pub fn new() -> Self {
         Self {
             max_dipole_moment: crate::constants::MTQ_MAX_DIPOLE_MOMENT,
-            s4e_port: S4EPublishPort::new(),
+            s5e_port: S5EPublishPort::new(),
             is_demagnetizing: false,
         }
     }
@@ -38,7 +38,7 @@ impl MagnetorquerDriver {
             .and_then(|ctrl| ctrl.demag.then_some(()))
             .is_some();
         if self.is_demagnetizing {
-            self.s4e_port.publish(s4e_port::MagnetorquerCtrlEvent {
+            self.s5e_port.publish(s5e_port::MagnetorquerCtrlEvent {
                 magnetic_moment: Vector3::new(0.0, 0.0, 0.0),
             });
         } else if let Some(target_moment) = input.moment {
@@ -56,21 +56,21 @@ impl MagnetorquerDriver {
                     .z
                     .clamp(-self.max_dipole_moment, self.max_dipole_moment),
             );
-            self.s4e_port.publish(s4e_port::MagnetorquerCtrlEvent {
+            self.s5e_port.publish(s5e_port::MagnetorquerCtrlEvent {
                 magnetic_moment: clipped_moment,
             });
         }
     }
 
     pub fn clear(&mut self) {
-        self.s4e_port.clear();
+        self.s5e_port.clear();
     }
 }
 
 pub struct ReactionWheelDriver {
     pub max_angular_acceleration: f64,
     pub inertia: Matrix3<f64>,
-    pub s4e_port: S4EPublishPort<s4e_port::ReactionWheelCtrlEvent>,
+    pub s5e_port: S5EPublishPort<s5e_port::ReactionWheelCtrlEvent>,
 }
 
 impl Default for ReactionWheelDriver {
@@ -84,7 +84,7 @@ impl ReactionWheelDriver {
         Self {
             max_angular_acceleration: RW_MAX_ANGULAR_ACCELERATION,
             inertia: RW_INERTIA,
-            s4e_port: S4EPublishPort::new(),
+            s5e_port: S5EPublishPort::new(),
         }
     }
 
@@ -105,13 +105,13 @@ impl ReactionWheelDriver {
                     self.max_angular_acceleration,
                 ),
             );
-            self.s4e_port.publish(s4e_port::ReactionWheelCtrlEvent {
+            self.s5e_port.publish(s5e_port::ReactionWheelCtrlEvent {
                 angular_acceleration: self.inertia.try_inverse().unwrap() * clipped_acceleration,
             });
         }
     }
 
     pub fn clear(&mut self) {
-        self.s4e_port.clear();
+        self.s5e_port.clear();
     }
 }

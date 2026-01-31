@@ -1,5 +1,5 @@
 use nalgebra::{Matrix3, UnitQuaternion, UnitVector3};
-use s4e_port::S4ESubscribePort;
+use s5e_port::S5ESubscribePort;
 
 use crate::{
     constants::{
@@ -138,7 +138,7 @@ pub struct MagnetometerDriverOutput {
 
 pub struct MagnetometerDriver {
     exclusive_timer: ExclusiveTimer,
-    pub s4e_port: S4ESubscribePort<s4e_port::MagnetometerData>,
+    pub s5e_port: S5ESubscribePort<s5e_port::MagnetometerData>,
     noise_std: f64,
     alignment: UnitQuaternion<f64>,
 }
@@ -147,7 +147,7 @@ impl MagnetometerDriver {
     pub fn new(alignment: UnitQuaternion<f64>) -> Self {
         Self {
             exclusive_timer: ExclusiveTimer::new(),
-            s4e_port: S4ESubscribePort::new(),
+            s5e_port: S5ESubscribePort::new(),
             noise_std: MAGNETOMETER_NOISE_STD,
             alignment,
         }
@@ -161,7 +161,7 @@ impl MagnetometerDriver {
             .exclusive_timer
             .observable()
             .then_some(())
-            .and(self.s4e_port.subscribe())
+            .and(self.s5e_port.subscribe())
             .map(|data| {
                 let magnetic_field = self
                     .alignment
@@ -179,7 +179,7 @@ impl MagnetometerDriver {
 }
 
 pub struct GyroDriver {
-    pub s4e_port: S4ESubscribePort<s4e_port::GyroSensorData>,
+    pub s5e_port: S5ESubscribePort<s5e_port::GyroSensorData>,
     noise_std: f64,
     alignment: UnitQuaternion<f64>,
 }
@@ -188,12 +188,12 @@ impl GyroDriver {
     pub fn new(alignment: UnitQuaternion<f64>) -> Self {
         Self {
             alignment,
-            s4e_port: S4ESubscribePort::new(),
+            s5e_port: S5ESubscribePort::new(),
             noise_std: GYRO_NOISE_STD,
         }
     }
     pub fn main_loop(&mut self) -> Option<data::GyroSensorData> {
-        self.s4e_port.subscribe().map(|data| data::GyroSensorData {
+        self.s5e_port.subscribe().map(|data| data::GyroSensorData {
             angular_velocity: self
                 .alignment
                 .inverse_transform_vector(&data.angular_velocity),
@@ -209,7 +209,7 @@ pub struct EciGnssDriverOutput {
 }
 
 pub struct EciGnssDriver {
-    pub s4e_port: S4ESubscribePort<s4e_port::ECIGnssData>,
+    pub s5e_port: S5ESubscribePort<s5e_port::ECIGnssData>,
     position_noise_std: f64,
     velocity_noise_std: f64,
 }
@@ -223,13 +223,13 @@ impl Default for EciGnssDriver {
 impl EciGnssDriver {
     pub fn new() -> Self {
         Self {
-            s4e_port: S4ESubscribePort::new(),
+            s5e_port: S5ESubscribePort::new(),
             position_noise_std: GNSS_POSITION_NOISE_STD,
             velocity_noise_std: GNSS_VELOCITY_NOISE_STD,
         }
     }
     pub fn main_loop(&mut self) -> EciGnssDriverOutput {
-        self.s4e_port
+        self.s5e_port
             .subscribe()
             .map(|data| {
                 (
@@ -262,7 +262,7 @@ impl EciGnssDriver {
 }
 
 pub struct SunSensorDriver {
-    pub s4e_port: S4ESubscribePort<s4e_port::LightDetectionSystemData>,
+    pub s5e_port: S5ESubscribePort<s5e_port::LightDetectionSystemData>,
     noise_std: f64,
     alignment: UnitQuaternion<f64>,
 }
@@ -270,14 +270,14 @@ pub struct SunSensorDriver {
 impl SunSensorDriver {
     pub fn new(alignment: UnitQuaternion<f64>) -> Self {
         Self {
-            s4e_port: S4ESubscribePort::new(),
+            s5e_port: S5ESubscribePort::new(),
             noise_std: SUN_SENSOR_NOISE_STD,
             alignment,
         }
     }
 
     pub fn main_loop(&mut self) -> Option<data::SunSensorData> {
-        self.s4e_port.subscribe().and_then(|data| {
+        self.s5e_port.subscribe().and_then(|data| {
             data.light_direction.map(|sun_d| {
                 let sun_d = self.alignment.inverse_transform_vector(&sun_d);
                 data::SunSensorData {
@@ -291,7 +291,7 @@ impl SunSensorDriver {
 }
 
 pub struct StarTrackerDriver {
-    pub s4e_port: S4ESubscribePort<s4e_port::StarTrackerData>,
+    pub s5e_port: S5ESubscribePort<s5e_port::StarTrackerData>,
     noise_std: f64,
     alignment: UnitQuaternion<f64>,
 }
@@ -299,14 +299,14 @@ pub struct StarTrackerDriver {
 impl StarTrackerDriver {
     pub fn new(alignment: UnitQuaternion<f64>) -> Self {
         Self {
-            s4e_port: S4ESubscribePort::new(),
+            s5e_port: S5ESubscribePort::new(),
             noise_std: STAR_TRACKER_NOISE_STD,
             alignment,
         }
     }
 
     pub fn main_loop(&mut self) -> Option<data::StarTrackerData> {
-        self.s4e_port.subscribe().map(|data| data::StarTrackerData {
+        self.s5e_port.subscribe().map(|data| data::StarTrackerData {
             attitude: self.alignment.conjugate() * data.attitude_quaternion,
             std: self.noise_std,
         })
@@ -314,7 +314,7 @@ impl StarTrackerDriver {
 }
 
 pub struct ReactionWheelStatusSensorDriver {
-    pub s4e_port: S4ESubscribePort<s4e_port::ReactionWheelRotationData>,
+    pub s5e_port: S5ESubscribePort<s5e_port::ReactionWheelRotationData>,
     inertia: Matrix3<f64>,
 }
 
@@ -327,13 +327,13 @@ impl Default for ReactionWheelStatusSensorDriver {
 impl ReactionWheelStatusSensorDriver {
     pub fn new() -> Self {
         Self {
-            s4e_port: S4ESubscribePort::new(),
+            s5e_port: S5ESubscribePort::new(),
             inertia: RW_INERTIA,
         }
     }
 
     pub fn main_loop(&mut self) -> Option<data::ReactionWheelMomentumData> {
-        self.s4e_port.subscribe().map(|data| {
+        self.s5e_port.subscribe().map(|data| {
             let momentum = self.inertia * (data.speed_rpm * (2.0 * std::f64::consts::PI / 60.0));
             data::ReactionWheelMomentumData { momentum }
         })
