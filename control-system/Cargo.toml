@@ -1,0 +1,10 @@
+[package]
+name = "control-system"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+nalgebra = { version = "0.33", default-features = false, features = ["libm"] }
+num-traits = { version = "0.2", default-features = false, features = ["libm"] }
+thiserror = { version = "2", default-features = false }
+control-system-macro = { path = "./control-system-macro" }

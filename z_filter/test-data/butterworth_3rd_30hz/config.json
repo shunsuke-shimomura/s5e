@@ -1,0 +1,29 @@
+{
+  "name": "butterworth_3rd_30hz",
+  "description": "3rd-order Butterworth lowpass filter, 30Hz cutoff",
+  "Ts": 0.001,
+  "prewarp_hz": 0.0,
+  "Nsamps": 1024,
+  "seed": 111,
+  "order": 3,
+  "w0_hz": null,
+  "zeta": null,
+  "num_coeffs": [
+    53578710.33532705
+  ],
+  "den_coeffs": [
+    1.0,
+    376.9908,
+    71061.03164232,
+    6697338.791915881
+  ],
+  "generate_impulse": true,
+  "generate_step": true,
+  "generate_sine": true,
+  "generate_chirp": true,
+  "generate_noise": true,
+  "sine_freq_hz": 30.0,
+  "chirp_f0": 5.0,
+  "chirp_f1": 200.0,
+  "noise_std": 0.1
+}

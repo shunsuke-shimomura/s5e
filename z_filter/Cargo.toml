@@ -1,0 +1,10 @@
+[package]
+name = "z_filter"
+edition = "2021"
+
+[dependencies]
+polynomial = { path = "../polynomial" }
+thiserror = { version = "2", default-features = false }
+
+[dev-dependencies]
+serde_json = "1.0"

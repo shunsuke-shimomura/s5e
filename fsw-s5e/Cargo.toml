@@ -1,0 +1,19 @@
+[package]
+name = "fsw-s5e"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+csv = "1.3.0"
+s5e-port = { path = "../s5e-port" }
+control-system = { path = "../control-system" }
+astrodynamics = { path = "../astrodynamics" }
+z_filter = { path = "..//z_filter"  }
+nalgebra = "0.33.0"
+igrf = "0.2.0"
+time = "0.3.36"
+
+[dev-dependencies]
+rand = "0.8.5"
+sgp4 = "2.2.0"
+statrs = { version = "0.18.0", features = ["rand"] }

@@ -1,0 +1,31 @@
+{
+  "name": "bessel_5th_order",
+  "description": "5th-order Bessel-like filter for linear phase",
+  "Ts": 0.001,
+  "prewarp_hz": 0.0,
+  "Nsamps": 1024,
+  "seed": 555,
+  "order": 5,
+  "w0_hz": null,
+  "zeta": null,
+  "num_coeffs": [
+    945.0
+  ],
+  "den_coeffs": [
+    1.0,
+    15.0,
+    105.0,
+    420.0,
+    945.0,
+    945.0
+  ],
+  "generate_impulse": true,
+  "generate_step": true,
+  "generate_sine": true,
+  "generate_chirp": true,
+  "generate_noise": true,
+  "sine_freq_hz": 30.0,
+  "chirp_f0": 5.0,
+  "chirp_f1": 200.0,
+  "noise_std": 0.1
+}

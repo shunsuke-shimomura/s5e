@@ -1,0 +1,30 @@
+{
+  "name": "custom_bandpass",
+  "description": "Custom 2nd-order bandpass filter using explicit coefficients",
+  "Ts": 0.0005,
+  "prewarp_hz": 0.0,
+  "Nsamps": 2048,
+  "seed": 456,
+  "order": 2,
+  "w0_hz": null,
+  "zeta": null,
+  "num_coeffs": [
+    0.0,
+    1.0,
+    0.0
+  ],
+  "den_coeffs": [
+    1.0,
+    100.0,
+    10000.0
+  ],
+  "generate_impulse": true,
+  "generate_step": true,
+  "generate_sine": true,
+  "generate_chirp": true,
+  "generate_noise": true,
+  "sine_freq_hz": 30.0,
+  "chirp_f0": 5.0,
+  "chirp_f1": 200.0,
+  "noise_std": 0.1
+}

@@ -1,0 +1,22 @@
+{
+  "name": "low_sample_rate_filter",
+  "description": "2nd-order filter designed for low sample rate (100Hz)",
+  "Ts": 0.01,
+  "prewarp_hz": 0.0,
+  "Nsamps": 512,
+  "seed": 999,
+  "order": 2,
+  "w0_hz": 10.0,
+  "zeta": 0.6,
+  "num_coeffs": null,
+  "den_coeffs": null,
+  "generate_impulse": true,
+  "generate_step": true,
+  "generate_sine": true,
+  "generate_chirp": false,
+  "generate_noise": true,
+  "sine_freq_hz": 30.0,
+  "chirp_f0": 5.0,
+  "chirp_f1": 40.0,
+  "noise_std": 0.1
+}

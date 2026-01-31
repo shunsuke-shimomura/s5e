@@ -1,0 +1,34 @@
+{
+  "name": "elliptic_4th_order",
+  "description": "4th-order elliptic-like filter with zeros",
+  "Ts": 0.001,
+  "prewarp_hz": 0.0,
+  "Nsamps": 1024,
+  "seed": 444,
+  "order": 4,
+  "w0_hz": null,
+  "zeta": null,
+  "num_coeffs": [
+    1.0,
+    0.0,
+    16.0,
+    0.0,
+    64.0
+  ],
+  "den_coeffs": [
+    1.0,
+    5.0,
+    20.0,
+    50.0,
+    100.0
+  ],
+  "generate_impulse": true,
+  "generate_step": true,
+  "generate_sine": true,
+  "generate_chirp": true,
+  "generate_noise": true,
+  "sine_freq_hz": 30.0,
+  "chirp_f0": 5.0,
+  "chirp_f1": 200.0,
+  "noise_std": 0.1
+}

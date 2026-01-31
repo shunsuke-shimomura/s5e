@@ -1,0 +1,9 @@
+[package]
+name = "debug-s5e"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+chrono = "0.4"
+once_cell = "1.19"
+anyhow = "1.0.86"

@@ -1,0 +1,26 @@
+{
+  "name": "highpass_20hz",
+  "description": "2nd-order high-pass filter using s^2 numerator",
+  "Ts": 0.001,
+  "prewarp_hz": 0.0,
+  "Nsamps": 1024,
+  "seed": 789,
+  "order": 2,
+  "w0_hz": 20.0,
+  "zeta": 0.707,
+  "num_coeffs": [
+    1.0,
+    0.0,
+    0.0
+  ],
+  "den_coeffs": null,
+  "generate_impulse": true,
+  "generate_step": true,
+  "generate_sine": true,
+  "generate_chirp": true,
+  "generate_noise": true,
+  "sine_freq_hz": 30.0,
+  "chirp_f0": 5.0,
+  "chirp_f1": 200.0,
+  "noise_std": 0.1
+}

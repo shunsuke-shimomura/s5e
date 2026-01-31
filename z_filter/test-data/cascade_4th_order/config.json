@@ -1,0 +1,22 @@
+{
+  "name": "cascade_4th_order",
+  "description": "4th-order filter as cascade of two 2nd-order sections",
+  "Ts": 0.001,
+  "prewarp_hz": 0.0,
+  "Nsamps": 1024,
+  "seed": 333,
+  "order": 4,
+  "w0_hz": 40.0,
+  "zeta": null,
+  "num_coeffs": null,
+  "den_coeffs": null,
+  "generate_impulse": true,
+  "generate_step": true,
+  "generate_sine": true,
+  "generate_chirp": true,
+  "generate_noise": true,
+  "sine_freq_hz": 30.0,
+  "chirp_f0": 5.0,
+  "chirp_f1": 200.0,
+  "noise_std": 0.1
+}
