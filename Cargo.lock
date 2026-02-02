@@ -514,6 +514,7 @@ dependencies = [
  "igrf",
  "nalgebra 0.33.2",
  "rand",
+ "s5e-lib",
  "s5e-port",
  "sgp4",
  "statrs",
@@ -1688,6 +1689,31 @@ dependencies = [
  "csv",
  "debug-s5e",
  "fsw-s5e",
+ "futures-util",
+ "igrf",
+ "nalgebra 0.33.2",
+ "rand",
+ "rand_distr",
+ "reqwest",
+ "rust-spice",
+ "s5e-lib",
+ "s5e-port",
+ "sgp4",
+ "time",
+ "tokio",
+]
+
+[[package]]
+name = "s5e-lib"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "astrodynamics",
+ "chrono",
+ "clap 4.5.56",
+ "control-system",
+ "csv",
+ "debug-s5e",
  "futures-util",
  "igrf",
  "nalgebra 0.33.2",

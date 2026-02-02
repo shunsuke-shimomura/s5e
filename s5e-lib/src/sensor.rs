@@ -223,8 +223,8 @@ impl Sensor for LightDetectionSystem {
     fn sensor_tick(&mut self, _: Self::IN) {
         if let Some(irradiance_data) = self.irradiance_port.subscribe() {
             let direction = if let Some(direction_data) = self.light_direction_port.subscribe()
-                // && direction_data.light_direction.z.acos() < self.detectable_angle
-                // && irradiance_data.irradiance > self.irradiance_threshold
+                && direction_data.light_direction.z.acos() < self.detectable_angle
+                && irradiance_data.irradiance > self.irradiance_threshold
             {
                 Some(direction_data.light_direction)
             } else {

@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+s5e-lib = { path = "../s5e-lib" }
 csv = "1.3.0"
 s5e-port = { path = "../s5e-port" }
 control-system = { path = "../control-system" }

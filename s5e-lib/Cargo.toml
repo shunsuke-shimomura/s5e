@@ -1,28 +1,13 @@
 [package]
-name = "s5e"
+name = "s5e-lib"
 version = "0.1.0"
 edition = "2024"
 
-[workspace]
-resolver = "2"
-members = [
-  "astrodynamics",
-  "control-system",
-  "debug-s5e",
-  "fsw-s5e",
-  "polynomial", 
-  "s5e-lib",
-  "s5e-port",
-  "z_filter",
-]
-
 [dependencies]
-s5e-lib = { path = "./s5e-lib" }
-s5e-port = { path = "./s5e-port" }
-fsw-s5e = { path = "./fsw-s5e" }
-debug-s5e = { path = "./debug-s5e" }
-control-system = { path = "./control-system" }
-astrodynamics = { path = "./astrodynamics" }
+s5e-port = { path = "../s5e-port" }
+debug-s5e = { path = "../debug-s5e" }
+control-system = { path = "../control-system" }
+astrodynamics = { path = "../astrodynamics" }
 rust-spice = { git = "https://github.com/shunsuke-shimomura/rust-spice", branch = "main", features = ["download"] }
 anyhow = "1.0.86"
 chrono = "0.4"

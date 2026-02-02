@@ -3,7 +3,7 @@ use std::ops::{Add, AddAssign, Sub};
 use std::time::{Duration, Instant};
 
 use nalgebra::{UnitQuaternion, Vector3};
-use s5e_port::S5EPublishPort;
+use s5e_port::S5ESubscribePort;
 
 use crate::{
     controller::{AttitudeControllMode, ControllerInput},
@@ -111,8 +111,14 @@ pub struct Time {
     relative: f64,
 }
 
+impl Default for Time {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Time {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Time {
             absolute: None,
             relative: 0.0,
@@ -213,24 +219,6 @@ impl AddAssign<f64> for AbsoluteTime {
         let result = *self + other;
         *self = result;
     }
-}
-
-pub struct FswInputPort<'a> {
-    pub magnetometer: &'a S5EPublishPort<s5e_port::MagnetometerData>,
-    pub gyro: &'a S5EPublishPort<s5e_port::GyroSensorData>,
-    pub eci_gnss: &'a S5EPublishPort<s5e_port::ECIGnssData>,
-    pub sun_sensor_pz: &'a S5EPublishPort<s5e_port::LightDetectionSystemData>,
-    pub sun_sensor_py: &'a S5EPublishPort<s5e_port::LightDetectionSystemData>,
-    pub sun_sensor_mz: &'a S5EPublishPort<s5e_port::LightDetectionSystemData>,
-    pub sun_sensor_my: &'a S5EPublishPort<s5e_port::LightDetectionSystemData>,
-    pub star_tracker: &'a S5EPublishPort<s5e_port::StarTrackerData>,
-    pub rw_status: &'a S5EPublishPort<s5e_port::ReactionWheelRotationData>,
-    pub cmd: &'a S5EPublishPort<s5e_port::GSCommandData>,
-}
-
-pub struct FswOutputPort<'a> {
-    pub magnetorquer_ctrl: &'a S5EPublishPort<s5e_port::MagnetorquerCtrlEvent>,
-    pub reaction_wheel_ctrl: &'a S5EPublishPort<s5e_port::ReactionWheelCtrlEvent>,
 }
 
 pub struct Fsw {
@@ -363,25 +351,6 @@ impl Fsw {
         *self = Self::new(debug_print_flag);
     }
 
-    pub fn input(&mut self, input_port: FswInputPort) {
-        s5e_port::transfer(input_port.gyro, &mut self.gyro_driver.s5e_port);
-        s5e_port::transfer(
-            input_port.magnetometer,
-            &mut self.magnetometer_driver.s5e_port,
-        );
-        s5e_port::transfer(input_port.eci_gnss, &mut self.eci_gnss_driver.s5e_port);
-        s5e_port::transfer(input_port.sun_sensor_pz, &mut self.ss_pz_driver.s5e_port);
-        s5e_port::transfer(input_port.sun_sensor_py, &mut self.ss_py_driver.s5e_port);
-        s5e_port::transfer(input_port.sun_sensor_mz, &mut self.ss_mz_driver.s5e_port);
-        s5e_port::transfer(input_port.sun_sensor_my, &mut self.ss_my_driver.s5e_port);
-        s5e_port::transfer(
-            input_port.star_tracker,
-            &mut self.star_tracker_driver.s5e_port,
-        );
-        s5e_port::transfer(input_port.rw_status, &mut self.rw_status_driver.s5e_port);
-        s5e_port::transfer(input_port.cmd, &mut self.cmd_receiver.s5e_port);
-    }
-
     pub fn main_loop(&mut self, dt: f64) {
         self.profile.call_count += 1;
 
@@ -465,7 +434,6 @@ impl Fsw {
             },
             dt,
         );
-
         self.magnetorquer_driver.main_loop(MagnetorquerDriverInput {
             moment: controller_data.mtq_ctrl.clone(),
             exclusive_ctrl: magnetometer_data.exclusive_ctrl,
@@ -708,9 +676,77 @@ impl Fsw {
         }
         self.profile.logging += t0.elapsed();
     }
+}
 
-    pub fn output<'a>(&'a self) -> FswOutputPort<'a> {
-        FswOutputPort {
+pub struct FswInputPortSet<'a> {
+    pub gyro: &'a mut S5ESubscribePort<s5e_port::GyroSensorData>,
+    pub magnetometer: &'a mut S5ESubscribePort<s5e_port::MagnetometerData>,
+    pub eci_gnss: &'a mut S5ESubscribePort<s5e_port::ECIGnssData>,
+    pub sun_sensor_pz: &'a mut S5ESubscribePort<s5e_port::LightDetectionSystemData>,
+    pub sun_sensor_py: &'a mut S5ESubscribePort<s5e_port::LightDetectionSystemData>,
+    pub sun_sensor_mz: &'a mut S5ESubscribePort<s5e_port::LightDetectionSystemData>,
+    pub sun_sensor_my: &'a mut S5ESubscribePort<s5e_port::LightDetectionSystemData>,
+    pub star_tracker: &'a mut S5ESubscribePort<s5e_port::StarTrackerData>,
+    pub rw_status: &'a mut S5ESubscribePort<s5e_port::ReactionWheelRotationData>,
+    pub cmd: &'a mut S5ESubscribePort<s5e_port::GSCommandData>,
+}
+
+impl<'a> s5e_lib::FswInputTransfer<s5e_lib::SensorOutputPortSet<'a>> for FswInputPortSet<'_> {
+    fn transfer_from(&mut self, sensor_output: &s5e_lib::SensorOutputPortSet<'a>) {
+        s5e_port::transfer(sensor_output.gyro, self.gyro);
+        s5e_port::transfer(sensor_output.magnetometer, self.magnetometer);
+        s5e_port::transfer(sensor_output.eci_gnss, self.eci_gnss);
+        s5e_port::transfer(sensor_output.sun_sensor_pz, self.sun_sensor_pz);
+        s5e_port::transfer(sensor_output.sun_sensor_py, self.sun_sensor_py);
+        s5e_port::transfer(sensor_output.sun_sensor_mz, self.sun_sensor_mz);
+        s5e_port::transfer(sensor_output.sun_sensor_my, self.sun_sensor_my);
+        s5e_port::transfer(sensor_output.star_tracker, self.star_tracker);
+        s5e_port::transfer(sensor_output.rw_status, self.rw_status);
+        s5e_port::transfer(sensor_output.cmd, self.cmd);
+    }
+}
+
+pub struct FswOutputPortSet<'a> {
+    pub magnetorquer_ctrl: &'a s5e_port::S5EPublishPort<s5e_port::MagnetorquerCtrlEvent>,
+    pub reaction_wheel_ctrl: &'a s5e_port::S5EPublishPort<s5e_port::ReactionWheelCtrlEvent>,
+}
+
+impl<'a> s5e_lib::FswOutputTransfer<s5e_lib::ActuatorInputPortSet<'a>> for FswOutputPortSet<'_> {
+    fn transfer_to(&self, actuator_input: &mut s5e_lib::ActuatorInputPortSet<'a>) {
+        s5e_port::transfer(self.magnetorquer_ctrl, actuator_input.magnetorquer_ctrl);
+        s5e_port::transfer(self.reaction_wheel_ctrl, actuator_input.reaction_wheel_ctrl);
+    }
+}
+
+impl s5e_lib::S5EFswInterface for Fsw {
+    type InputPortSet<'a> = FswInputPortSet<'a>;
+    type OutputPortSet<'a> = FswOutputPortSet<'a>;
+
+    fn init(&mut self) {
+        self.init();
+    }
+
+    fn main_loop(&mut self, dt: f64) {
+        self.main_loop(dt);
+    }
+
+    fn input_ports(&mut self) -> FswInputPortSet<'_> {
+        FswInputPortSet {
+            gyro: &mut self.gyro_driver.s5e_port,
+            magnetometer: &mut self.magnetometer_driver.s5e_port,
+            eci_gnss: &mut self.eci_gnss_driver.s5e_port,
+            sun_sensor_pz: &mut self.ss_pz_driver.s5e_port,
+            sun_sensor_py: &mut self.ss_py_driver.s5e_port,
+            sun_sensor_mz: &mut self.ss_mz_driver.s5e_port,
+            sun_sensor_my: &mut self.ss_my_driver.s5e_port,
+            star_tracker: &mut self.star_tracker_driver.s5e_port,
+            rw_status: &mut self.rw_status_driver.s5e_port,
+            cmd: &mut self.cmd_receiver.s5e_port,
+        }
+    }
+
+    fn output_ports(&self) -> FswOutputPortSet<'_> {
+        FswOutputPortSet {
             magnetorquer_ctrl: &self.magnetorquer_driver.s5e_port,
             reaction_wheel_ctrl: &self.rw_driver.s5e_port,
         }

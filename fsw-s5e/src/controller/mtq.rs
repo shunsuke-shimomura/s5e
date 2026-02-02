@@ -201,7 +201,7 @@ impl BdotDetumblingController {
         angular_velocity: &Vector3<f64>,
     ) -> Vector3<f64> {
         let magnetic_field = magnetic_field_body;
-        let moment = self.bdot_gain * magnetic_field.cross(angular_velocity);
+        let moment = self.bdot_gain * magnetic_field.normalize().cross(angular_velocity);
         -moment
     }
 }

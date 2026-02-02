@@ -693,6 +693,7 @@ where
             x_nominal.merge_sigma(&State::SigmaStruct::from(x_mean_vec + state_correction));
 
         self.covariance -= kyx * yy_cov * kyx.transpose();
+        self.covariance = (self.covariance + self.covariance.transpose()) / 2.0; // 数値安定化のため対称化
         self.state = new_state;
 
         Ok(())

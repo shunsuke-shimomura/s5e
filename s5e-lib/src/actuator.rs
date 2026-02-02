@@ -84,7 +84,6 @@ impl Actuator for Magnetorquer {
         let halfdt = BodyVector::from(
             (Vector3::from(self.magnetic_moment.get_now()) + Vector3::from(moment.clone())) * 0.5,
         );
-
         debug_actuator!(
             "Magnetorquer: current moment: x={:.6}, y={:.6}, z={:.6} Am²",
             moment.x,
