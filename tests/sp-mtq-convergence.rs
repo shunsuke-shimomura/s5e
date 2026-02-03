@@ -23,7 +23,7 @@ fn sp_mtq_convergence() -> anyhow::Result<()> {
     let mut earth = s5e_lib::earth::Earth::new(datetime);
     let mut moon = s5e_lib::moon::Moon::new(datetime);
 
-    let sat_initial_state = s5e_lib::SpaceCraftInitialState {
+    let sat_initial_state = c5a_sim::SpaceCraftInitialState {
         tle: tle.clone(),
         attitude: UnitQuaternion::new_normalize(Quaternion::new(
             -1.0, 4.0, -3.0, 2.0,
@@ -39,20 +39,20 @@ fn sp_mtq_convergence() -> anyhow::Result<()> {
         ),
     };
 
-    let components_profile = s5e_lib::SpaceCraftComponentsProfile {
-        gyro_std: fsw_s5e::constants::GYRO_NOISE_STD,
-        magnetometer_std: fsw_s5e::constants::MAGNETOMETER_NOISE_STD,
-        star_tracker_std: fsw_s5e::constants::STAR_TRACKER_NOISE_STD,
-        sun_sensor_dir_std: fsw_s5e::constants::SUN_SENSOR_NOISE_STD,
+    let components_profile = c5a_sim::SpaceCraftComponentsProfile {
+        gyro_std: c5a::constants::GYRO_NOISE_STD,
+        magnetometer_std: c5a::constants::MAGNETOMETER_NOISE_STD,
+        star_tracker_std: c5a::constants::STAR_TRACKER_NOISE_STD,
+        sun_sensor_dir_std: c5a::constants::SUN_SENSOR_NOISE_STD,
         rw_noise_std: 0.0,
         mtq_noise_std: 0.0,
-        mtq_max_dipole_moment: fsw_s5e::constants::MTQ_MAX_DIPOLE_MOMENT,
+        mtq_max_dipole_moment: c5a::constants::MTQ_MAX_DIPOLE_MOMENT,
     };
 
-    let mut sat = s5e_lib::SpaceCraft::new(
+    let mut sat = c5a_sim::SpaceCraft::new(
         datetime,
         rng,
-        fsw_s5e::Fsw::new(false),
+        c5a::Fsw::new(false),
         components_profile,
         sat_initial_state,
     );

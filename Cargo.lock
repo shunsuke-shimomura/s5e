@@ -186,6 +186,43 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b35204fbdc0b3f4446b89fc1ac2cf84a8a68971995d0bf2e925ec7cd960f9cb3"
 
 [[package]]
+name = "c5a"
+version = "0.1.0"
+dependencies = [
+ "astrodynamics",
+ "control-system",
+ "csv",
+ "igrf",
+ "nalgebra 0.33.2",
+ "rand",
+ "s5e-lib",
+ "s5e-port",
+ "sgp4",
+ "statrs",
+ "time",
+ "z_filter",
+]
+
+[[package]]
+name = "c5a-sim"
+version = "0.1.0"
+dependencies = [
+ "astrodynamics",
+ "c5a",
+ "chrono",
+ "control-system",
+ "debug-s5e",
+ "igrf",
+ "nalgebra 0.33.2",
+ "rand",
+ "rand_distr",
+ "s5e-lib",
+ "s5e-port",
+ "sgp4",
+ "time",
+]
+
+[[package]]
 name = "cc"
 version = "1.2.55"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -502,24 +539,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cb4cb245038516f5f85277875cdaa4f7d2c9a0fa0468de06ed190163b1581fcf"
 dependencies = [
  "percent-encoding",
-]
-
-[[package]]
-name = "fsw-s5e"
-version = "0.1.0"
-dependencies = [
- "astrodynamics",
- "control-system",
- "csv",
- "igrf",
- "nalgebra 0.33.2",
- "rand",
- "s5e-lib",
- "s5e-port",
- "sgp4",
- "statrs",
- "time",
- "z_filter",
 ]
 
 [[package]]
@@ -1683,12 +1702,13 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "astrodynamics",
+ "c5a",
+ "c5a-sim",
  "chrono",
  "clap 4.5.56",
  "control-system",
  "csv",
  "debug-s5e",
- "fsw-s5e",
  "futures-util",
  "igrf",
  "nalgebra 0.33.2",

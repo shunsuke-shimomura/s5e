@@ -24,7 +24,7 @@ fn bdot_convergence() -> anyhow::Result<()> {
     let mut earth = s5e_lib::earth::Earth::new(datetime);
     let mut moon = s5e_lib::moon::Moon::new(datetime);
 
-    let sat_initial_state = s5e_lib::SpaceCraftInitialState {
+    let sat_initial_state = c5a_sim::SpaceCraftInitialState {
         tle: tle.clone(),
         attitude: UnitQuaternion::new_normalize(Quaternion::new(
             -1.0, 4.0, -3.0, 2.0,
@@ -40,20 +40,20 @@ fn bdot_convergence() -> anyhow::Result<()> {
         ),
     };
 
-    let components_profile = s5e_lib::SpaceCraftComponentsProfile {
-        gyro_std: fsw_s5e::constants::GYRO_NOISE_STD,
-        magnetometer_std: fsw_s5e::constants::MAGNETOMETER_NOISE_STD,
-        star_tracker_std: fsw_s5e::constants::STAR_TRACKER_NOISE_STD,
-        sun_sensor_dir_std: fsw_s5e::constants::SUN_SENSOR_NOISE_STD,
+    let components_profile = c5a_sim::SpaceCraftComponentsProfile {
+        gyro_std: c5a::constants::GYRO_NOISE_STD,
+        magnetometer_std: c5a::constants::MAGNETOMETER_NOISE_STD,
+        star_tracker_std: c5a::constants::STAR_TRACKER_NOISE_STD,
+        sun_sensor_dir_std: c5a::constants::SUN_SENSOR_NOISE_STD,
         rw_noise_std: 0.0,
         mtq_noise_std: 0.0,
-        mtq_max_dipole_moment: fsw_s5e::constants::MTQ_MAX_DIPOLE_MOMENT,
+        mtq_max_dipole_moment: c5a::constants::MTQ_MAX_DIPOLE_MOMENT,
     };
 
-    let mut sat = s5e_lib::SpaceCraft::new(
+    let mut sat = c5a_sim::SpaceCraft::new(
         datetime,
         rng,
-        fsw_s5e::Fsw::new(false),
+        c5a::Fsw::new(false),
         components_profile,
         sat_initial_state,
     );
@@ -81,11 +81,11 @@ fn bdot_convergence() -> anyhow::Result<()> {
             &cmd_port,
         );
 
-        if let fsw_s5e::controller::AttitudeControllMode::MTQ(mtq) =
+        if let c5a::controller::AttitudeControllMode::MTQ(mtq) =
             &sat.obc.fsw.attitude_controller.mode
             && matches!(
                 mtq.mode,
-                fsw_s5e::controller::mtq::MTQControlMode::SunPointing(_)
+                c5a::controller::mtq::MTQControlMode::SunPointing(_)
             )
         {
             println!(
@@ -140,11 +140,11 @@ fn bdot_convergence() -> anyhow::Result<()> {
         }
     }
 
-    if let fsw_s5e::controller::AttitudeControllMode::MTQ(mtq) =
+    if let c5a::controller::AttitudeControllMode::MTQ(mtq) =
         &sat.obc.fsw.attitude_controller.mode
         && matches!(
             mtq.mode,
-            fsw_s5e::controller::mtq::MTQControlMode::SunPointing(_)
+            c5a::controller::mtq::MTQControlMode::SunPointing(_)
         )
     {
         println!(
@@ -160,14 +160,14 @@ fn bdot_convergence() -> anyhow::Result<()> {
 }
 
 pub struct BdotFsw {
-    pub time: fsw_s5e::Time,
-    timer: fsw_s5e::estimation::Timer,
+    pub time: c5a::Time,
+    timer: c5a::estimation::Timer,
 
-    pub gyro_driver: fsw_s5e::driver::sensor::GyroDriver,
-    pub magnetometer_driver: fsw_s5e::driver::sensor::MagnetometerDriver,
-    pub magnetorquer_driver: fsw_s5e::driver::actuator::MagnetorquerDriver,
+    pub gyro_driver: c5a::driver::sensor::GyroDriver,
+    pub magnetometer_driver: c5a::driver::sensor::MagnetometerDriver,
+    pub magnetorquer_driver: c5a::driver::actuator::MagnetorquerDriver,
 
-    pub bdot_controller: fsw_s5e::controller::mtq::BdotDetumblingController,
+    pub bdot_controller: c5a::controller::mtq::BdotDetumblingController,
 }
 
 impl Default for BdotFsw {
@@ -179,18 +179,18 @@ impl Default for BdotFsw {
 impl BdotFsw {
     pub fn new() -> Self {
         Self {
-            time: fsw_s5e::Time::new(),
-            timer: fsw_s5e::estimation::Timer::new(),
+            time: c5a::Time::new(),
+            timer: c5a::estimation::Timer::new(),
 
-            gyro_driver: fsw_s5e::driver::sensor::GyroDriver::new(
+            gyro_driver: c5a::driver::sensor::GyroDriver::new(
                 UnitQuaternion::identity(),
             ),
-            magnetometer_driver: fsw_s5e::driver::sensor::MagnetometerDriver::new(
+            magnetometer_driver: c5a::driver::sensor::MagnetometerDriver::new(
                 UnitQuaternion::from_axis_angle(&Vector3::z_axis(), core::f64::consts::FRAC_PI_2)
             ),
-            magnetorquer_driver: fsw_s5e::driver::actuator::MagnetorquerDriver::new(),
+            magnetorquer_driver: c5a::driver::actuator::MagnetorquerDriver::new(),
 
-            bdot_controller: fsw_s5e::controller::mtq::BdotDetumblingController::new(),
+            bdot_controller: c5a::controller::mtq::BdotDetumblingController::new(),
         }
     }
 
@@ -216,8 +216,8 @@ impl BdotFsw {
         };        
 
         // Command magnetorquers
-        self.magnetorquer_driver.main_loop(fsw_s5e::driver::actuator::MagnetorquerDriverInput {
-            moment: mtq_control.map(|moment| fsw_s5e::data::MagnetorquerCtrlEvent {
+        self.magnetorquer_driver.main_loop(c5a::driver::actuator::MagnetorquerDriverInput {
+            moment: mtq_control.map(|moment| c5a::data::MagnetorquerCtrlEvent {
                 magnetic_moment: moment,
             }),
             exclusive_ctrl: magnetometer_measurement.exclusive_ctrl,
@@ -231,8 +231,8 @@ pub struct BdotFswInputPortSet<'a> {
     pub magnetometer: &'a mut S5ESubscribePort<s5e_port::MagnetometerData>,
 }
 
-impl<'a> s5e_lib::FswInputTransfer<s5e_lib::SensorOutputPortSet<'a>> for BdotFswInputPortSet<'a> {
-    fn transfer_from(&mut self, sensor_output: &s5e_lib::SensorOutputPortSet<'a>) {
+impl<'a> s5e_lib::SimInputTransfer<c5a_sim::SensorOutputPortSet<'a>> for BdotFswInputPortSet<'a> {
+    fn transfer_from(&mut self, sensor_output: &c5a_sim::SensorOutputPortSet<'a>) {
         s5e_port::transfer(sensor_output.gyro, self.gyro);
         s5e_port::transfer(sensor_output.magnetometer, self.magnetometer);
     }
@@ -242,13 +242,13 @@ pub struct BdotFswOutputPortSet<'a> {
     pub magnetorquer_ctrl: &'a S5EPublishPort<s5e_port::MagnetorquerCtrlEvent>,
 }
 
-impl<'a> s5e_lib::FswOutputTransfer<s5e_lib::ActuatorInputPortSet<'a>> for BdotFswOutputPortSet<'a> {
-    fn transfer_to(&self, actuator_input: &mut s5e_lib::ActuatorInputPortSet<'a>) {
+impl<'a> s5e_lib::SimOutputTransfer<c5a_sim::ActuatorInputPortSet<'a>> for BdotFswOutputPortSet<'a> {
+    fn transfer_to(&self, actuator_input: &mut c5a_sim::ActuatorInputPortSet<'a>) {
         s5e_port::transfer(self.magnetorquer_ctrl, actuator_input.magnetorquer_ctrl);
     }
 }
 
-impl s5e_lib::S5EFswInterface for BdotFsw {
+impl c5a_sim::C5ASimInterface for BdotFsw {
     type InputPortSet<'a> = BdotFswInputPortSet<'a> where Self: 'a;
     type OutputPortSet<'a> = BdotFswOutputPortSet<'a> where Self: 'a;
     
@@ -260,13 +260,13 @@ impl s5e_lib::S5EFswInterface for BdotFsw {
     }
     fn input_ports(&mut self) -> Self::InputPortSet<'_> {
         BdotFswInputPortSet {
-            gyro: &mut self.gyro_driver.s5e_port,
-            magnetometer: &mut self.magnetometer_driver.s5e_port,
+            gyro: &mut self.gyro_driver.sim_port,
+            magnetometer: &mut self.magnetometer_driver.sim_port,
         }
     }
     fn output_ports(&'_ self) -> Self::OutputPortSet<'_> {
         BdotFswOutputPortSet {
-            magnetorquer_ctrl: &self.magnetorquer_driver.s5e_port,
+            magnetorquer_ctrl: &self.magnetorquer_driver.sim_port,
         }
     }
 }
@@ -290,7 +290,7 @@ fn bdot_fsw_convergence() -> anyhow::Result<()> {
         "2 25544  51.6412  86.9962 0006063  30.9353 329.2153 15.49228202 17647".to_string(),
     );
 
-    let sat_initial_state = s5e_lib::SpaceCraftInitialState {
+    let sat_initial_state = c5a_sim::SpaceCraftInitialState {
         tle: tle.clone(),
         attitude: UnitQuaternion::new_normalize(Quaternion::new(
             -1.0, 4.0, -3.0, 2.0,
@@ -306,7 +306,7 @@ fn bdot_fsw_convergence() -> anyhow::Result<()> {
         ),
     };
 
-    let components_profile = s5e_lib::SpaceCraftComponentsProfile {
+    let components_profile = c5a_sim::SpaceCraftComponentsProfile {
         gyro_std: 0.0,
         magnetometer_std: 0.0,
         star_tracker_std: 0.0,
@@ -316,7 +316,7 @@ fn bdot_fsw_convergence() -> anyhow::Result<()> {
         mtq_max_dipole_moment: 1e1,
     };
 
-    let mut sat = s5e_lib::SpaceCraft::new(
+    let mut sat = c5a_sim::SpaceCraft::new(
         datetime,
         rng,
         BdotFsw::new(),

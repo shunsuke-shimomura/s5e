@@ -9,17 +9,18 @@ members = [
   "astrodynamics",
   "control-system",
   "debug-s5e",
-  "fsw-s5e",
+  "c5a",
   "polynomial", 
   "s5e-lib",
   "s5e-port",
-  "z_filter",
+  "z_filter", "c5a-sim",
 ]
 
 [dependencies]
 s5e-lib = { path = "./s5e-lib" }
 s5e-port = { path = "./s5e-port" }
-fsw-s5e = { path = "./fsw-s5e" }
+c5a = { path = "./c5a" }
+c5a-sim = { path = "./c5a-sim" }
 debug-s5e = { path = "./debug-s5e" }
 control-system = { path = "./control-system" }
 astrodynamics = { path = "./astrodynamics" }
