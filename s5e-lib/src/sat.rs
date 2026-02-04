@@ -221,8 +221,6 @@ pub struct VirtualMagFieldSim<Fsw> {
     pub magnetic_field_model: VirtualMagneticFieldModel,
     pub sun_direction_eci: ECIVector,
 
-    // Max dipole moment for MTQ (Am²)
-    pub mtq_max_dipole_moment: f64,
 }
 
 impl<Fsw> VirtualMagFieldSim<Fsw> {
@@ -233,7 +231,6 @@ impl<Fsw> VirtualMagFieldSim<Fsw> {
         initial_angular_velocity: BodyVector,
         sun_direction_eci: ECIVector,
         magnetic_field_model: VirtualMagneticFieldModel,
-        mtq_max_dipole_moment: f64,
     ) -> Self {
         Self {
             inertia,
@@ -247,7 +244,6 @@ impl<Fsw> VirtualMagFieldSim<Fsw> {
             mtq_ctrl_port: s5e_port::S5ESubscribePort::new(),
             magnetic_field_model,
             sun_direction_eci,
-            mtq_max_dipole_moment,
         }
     }
 
@@ -291,14 +287,7 @@ impl<Fsw> VirtualMagFieldSim<Fsw> {
 
         // Get MTQ command and apply saturation
         if let Some(ctrl_event) = self.mtq_ctrl_port.subscribe() {
-            let moment = Vector3::from(ctrl_event.magnetic_moment);
-            let moment_norm = moment.norm();
-            let saturated_moment = if moment_norm > self.mtq_max_dipole_moment {
-                moment * (self.mtq_max_dipole_moment / moment_norm)
-            } else {
-                moment
-            };
-            self.magnetic_moment = BodyVector::from(saturated_moment);
+            self.magnetic_moment = BodyVector::from(ctrl_event.magnetic_moment);
         }
 
         // Calculate torque from MTQ: τ = m × B (in body frame)
